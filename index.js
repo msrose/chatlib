@@ -60,9 +60,10 @@ const replaceRandomNoun = (s1, addAdjective = true) => {
   let index;
   while(true) {
     if(nounIndices.length === 0) return joinAsSentence(words, tagged);
-    index = _.sample(nounIndices);
+    const i = _.random(nounIndices.length - 1);
+    index = nounIndices[i];
     if(words[index - 1] !== "'") break;
-    else nounIndices.splice(index, 1);
+    else nounIndices.splice(i, 1);
   }
   const [word, pos] = tagged[index];
   const isPlural = pos.endsWith('S') || pos === 'PRP' && ['we', 'they'].includes(word.toLowerCase());
