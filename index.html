@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+    <title>Chatlib</title>
+    <style>
+      h1 { text-transform: uppercase; }
+      body { font-family: sans-serif; overflow: hidden; }
+      .chatbox { position: absolute; bottom: 0; left: 0; padding: 10px; width: 95%; }
+      .chatbox .input-box { font-size: 30px; width: 85%; }
+      .chatbox button { font-size: 30px; width: 10%; }
+      .message { border-bottom: 1px solid lightgray; padding: 5px; margin: 5px 10px; }
+      .messages { width: 100%; overflow-y: scroll; word-wrap: break-word; }
+    </style>
+    <script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
+  </head>
+  <body>
+    <h1 id="title">Chatlib</h1>
+    <div id="messageList" class="messages"></div>
+    <div class="chatbox">
+      <input id="inputBox" class="input-box" type="text" placeholder="Enter your message">
+      <button id="messageButton">Send</button>
+    </div>
+    <script>
+      (function() {
+        var socket = io();
+        var title = document.getElementById("title");
+        var inputBox = document.getElementById("inputBox");
+        var messages = document.getElementById("messageList");
+        function setMessagesHeight() {
+          const ibbcr = inputBox.getBoundingClientRect();
+          const tbcr = title.getBoundingClientRect();
+          var height = (ibbcr.top - (tbcr.top + title.offsetHeight + 30)) + 'px';
+          messages.style.height = height;
+        }
+        function addMessage(val) {
+          var messageDiv = document.createElement('div');
+          messageDiv.className = "message";
+          messageDiv.appendChild(document.createTextNode(val));
+          messages.appendChild(messageDiv);
+          messages.scrollTop = messages.scrollHeight;
+        }
+        function addMessageFromBox() {
+          var val = inputBox.value.trim();
+          if(!val) return;
+          addMessage(val);
+          inputBox.value = '';
+          socket.emit('message', val);
+        }
+        window.addEventListener('resize', setMessagesHeight);
+        document.getElementById("messageButton").addEventListener("click", addMessageFromBox);
+        inputBox.addEventListener("keypress", function() {
+          if(event.keyCode === 13) addMessageFromBox();
+        });
+        setMessagesHeight();
+        socket.on('message', function(message) {
+          addMessage(message);
+        });
+      })();
+    </script>
+  </body>
+</html>
