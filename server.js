@@ -15,7 +15,7 @@ io.on('connection', (socket) => {
   socket.on('message', (message) => {
     console.log('got a message: %s', message);
     const changed = replaceRandomNounAllSentences(message);
-    console.log('changed message to: %s', message);
+    console.log('changed message to: %s', changed);
     socket.broadcast.emit('message', changed);
   });
 });
